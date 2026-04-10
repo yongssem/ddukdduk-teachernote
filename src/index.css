@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #FFF8F0;
+  --color-card: #FFFFFF;
+  --color-primary: #FF9A8B;
+  --color-accent: #A8E6CF;
+  --color-text: #4A4A4A;
+  --color-muted: #9CA3AF;
+  --color-tag-excellent: #A8E6CF;
+  --color-tag-participate: #B5DEFF;
+  --color-tag-growth: #FFE5A8;
+  --color-tag-noise: #FFB5A8;
+  --color-tag-special: #D4B5FF;
+  --color-tag-custom: #E5E5E5;
+  --radius-lg: 20px;
+  --radius-card: 24px;
+}
+
+* {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100dvh;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-bounce:active {
+  transform: scale(0.95);
+}
+.btn-bounce {
+  transition: transform 0.1s;
+}
+
+.tag-scroll::-webkit-scrollbar {
+  display: none;
+}
+.tag-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
