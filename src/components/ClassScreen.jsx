@@ -118,8 +118,16 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
       />
 
       <div className="px-4">
+        {/* Add student button */}
+        <button
+          className="btn-bounce w-full bg-primary text-white font-bold py-3 rounded-[16px] flex items-center justify-center gap-2 mb-4"
+          onClick={() => setShowAdd(true)}
+        >
+          <span className="text-lg">+</span> 학생 추가
+        </button>
+
         {/* Student list */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2">
           {students.map(student => {
             const recordCount = (student.records || []).length;
             const lastRecord = (student.records || [])
@@ -159,14 +167,6 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
             );
           })}
         </div>
-
-        {/* Add student button */}
-        <button
-          className="btn-bounce w-full bg-primary text-white font-bold py-3 rounded-[16px] flex items-center justify-center gap-2"
-          onClick={() => setShowAdd(true)}
-        >
-          <span className="text-lg">+</span> 학생 추가
-        </button>
       </div>
 
       {/* Add student modal */}
