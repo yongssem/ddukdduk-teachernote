@@ -16,6 +16,7 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
   const [showResetFinal, setShowResetFinal] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(null);
   const [showExportClass, setShowExportClass] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const fileRef = useRef(null);
 
   function saveSchool() {
@@ -331,6 +332,18 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
             <p className="text-xs text-muted text-center">마지막 백업: {data.lastBackupDate}</p>
           )}
         </div>
+
+        {/* About */}
+        <button
+          onClick={() => setShowAbout(true)}
+          className="btn-bounce w-full bg-card rounded-[24px] shadow-sm p-4 text-sm text-left flex items-center gap-3"
+        >
+          <span className="text-lg">📋</span>
+          <div>
+            <p className="font-bold">뚝딱교담수첩</p>
+            <p className="text-xs text-muted">앱 소개 · v1.0</p>
+          </div>
+        </button>
       </div>
 
       {/* Custom tag modal */}
@@ -422,6 +435,73 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
               초기화
             </button>
           </div>
+        </div>
+      </Modal>
+
+      {/* About modal */}
+      <Modal open={showAbout} onClose={() => setShowAbout(false)} wide>
+        <div className="space-y-4 text-sm">
+          <div className="text-center">
+            <p className="text-4xl mb-2">📋</p>
+            <h2 className="text-xl font-bold">뚝딱교담수첩</h2>
+            <p className="text-xs text-muted mt-1">교담(전담) 교사를 위한 학생 누가기록 앱</p>
+          </div>
+
+          <div className="bg-bg rounded-[16px] p-4 space-y-3">
+            <div className="flex gap-3 items-start">
+              <span className="text-lg mt-0.5">🏫</span>
+              <div>
+                <p className="font-bold">다과목 반 관리</p>
+                <p className="text-xs text-muted">여러 과목을 담당해도 과목별로 반을 나눠 관리할 수 있어요.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start">
+              <span className="text-lg mt-0.5">📝</span>
+              <div>
+                <p className="font-bold">누가기록</p>
+                <p className="text-xs text-muted">날짜 · 메모 · 태그로 학생별 관찰 기록을 간편하게 남겨요.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start">
+              <span className="text-lg mt-0.5">🏷️</span>
+              <div>
+                <p className="font-bold">태그 시스템</p>
+                <p className="text-xs text-muted">우수 · 참여 · 성장 · 소란 · 특이 + 커스텀 태그로 기록을 분류해요.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start">
+              <span className="text-lg mt-0.5">📊</span>
+              <div>
+                <p className="font-bold">엑셀 내보내기</p>
+                <p className="text-xs text-muted">반별 · 전체 · 학생별 요약 + 통계까지 엑셀로 바로 뽑아요.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start">
+              <span className="text-lg mt-0.5">💾</span>
+              <div>
+                <p className="font-bold">백업 & 복구</p>
+                <p className="text-xs text-muted">JSON 파일로 데이터를 백업하고, 언제든 복구할 수 있어요.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-tag-growth/20 rounded-[16px] p-3 text-xs text-center">
+            <p>모든 데이터는 <b>내 브라우저에만</b> 저장돼요.</p>
+            <p className="mt-0.5">서버 전송 없이 안전하게 사용하세요.</p>
+          </div>
+
+          <div className="text-center text-xs text-muted pt-1">
+            <a href="https://mumuclass.kr" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              &copy; 2026 무궁무진클래스 · 용쌤
+            </a>
+          </div>
+
+          <button
+            onClick={() => setShowAbout(false)}
+            className="btn-bounce w-full bg-primary text-white font-bold py-3 rounded-[16px]"
+          >
+            닫기
+          </button>
         </div>
       </Modal>
 
