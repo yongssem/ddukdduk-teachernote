@@ -10,7 +10,7 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
   const [singleName, setSingleName] = useState('');
   const [singleNo, setSingleNo] = useState('');
   const [singleGender, setSingleGender] = useState('');
-  const [bulkText, setBulkText] = useState('');
+  const [bulkRows, setBulkRows] = useState([{ no: '', name: '', gender: '' }]);
   const fileRef = useRef(null);
 
   const students = [...(cls.students || [])].sort((a, b) => a.no - b.no);
@@ -40,32 +40,41 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
     setSingleGender('');
   }
 
+  function updateBulkRow(idx, field, value) {
+    const next = [...bulkRows];
+    next[idx] = { ...next[idx], [field]: value };
+    setBulkRows(next);
+  }
+
+  function addBulkRow() {
+    const lastNo = bulkRows[bulkRows.length - 1]?.no;
+    const nextNo = lastNo ? String(parseInt(lastNo) + 1) : '';
+    setBulkRows([...bulkRows, { no: nextNo, name: '', gender: '' }]);
+  }
+
+  function removeBulkRow(idx) {
+    if (bulkRows.length <= 1) return;
+    setBulkRows(bulkRows.filter((_, i) => i !== idx));
+  }
+
   function addBulkStudents() {
-    const lines = bulkText.trim().split('\n').filter(l => l.trim());
     const newStudents = [];
-    for (const line of lines) {
-      const parts = line.split(/\t|,/).map(s => s.trim());
-      const no = parseInt(parts[0]);
-      const name = parts[1];
+    for (const row of bulkRows) {
+      const no = parseInt(row.no);
+      const name = row.name.trim();
       if (!no || !name) continue;
       if (cls.students.find(s => s.no === no) || newStudents.find(s => s.no === no)) continue;
-      let gender = '';
-      if (parts[2]) {
-        const g = parts[2];
-        if (['남', 'M', 'm', '남자'].includes(g)) gender = 'M';
-        else if (['여', 'F', 'f', '여자'].includes(g)) gender = 'F';
-      }
-      newStudents.push({ no, name, gender, records: [] });
+      newStudents.push({ no, name, gender: row.gender, records: [] });
     }
     if (newStudents.length === 0) {
-      alert('추가할 학생이 없습니다. 형식: 번호\\t이름\\t성별');
+      alert('추가할 학생이 없습니다. 번호와 이름을 입력해주세요.');
       return;
     }
     updateClass({
       ...cls,
       students: [...cls.students, ...newStudents],
     });
-    setBulkText('');
+    setBulkRows([{ no: '', name: '', gender: '' }]);
     setShowAdd(false);
   }
 
@@ -167,7 +176,7 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
           <div className="flex gap-1 bg-bg rounded-[12px] p-1">
             {[
               ['single', '1명 추가'],
-              ['bulk', '일괄 붙여넣기'],
+              ['bulk', '일괄 추가'],
               ['excel', '엑셀 업로드'],
             ].map(([mode, label]) => (
               <button
@@ -229,14 +238,59 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
 
           {addMode === 'bulk' && (
             <div className="space-y-3">
-              <p className="text-xs text-muted">한 줄에 한 명씩. 형식: <b>번호 (탭) 이름 (탭) 성별</b></p>
-              <textarea
-                value={bulkText}
-                onChange={e => setBulkText(e.target.value)}
-                rows={6}
-                className="w-full border border-muted/30 rounded-[12px] px-3 py-2 bg-bg text-sm resize-none"
-                placeholder={`1\t홍길동\t남\n2\t김영희\t여\n3\t이철수\t남`}
-              />
+              {/* Column header */}
+              <div className="flex gap-2 text-xs text-muted px-1">
+                <span className="w-16 text-center">번호</span>
+                <span className="flex-1">이름</span>
+                <span className="w-16 text-center">성별</span>
+                <span className="w-7" />
+              </div>
+              {/* Rows */}
+              <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                {bulkRows.map((row, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      value={row.no}
+                      onChange={e => updateBulkRow(idx, 'no', e.target.value)}
+                      className="w-16 border border-muted/30 rounded-[10px] px-2 py-2 bg-bg text-center text-sm"
+                      placeholder="#"
+                    />
+                    <input
+                      type="text"
+                      value={row.name}
+                      onChange={e => updateBulkRow(idx, 'name', e.target.value)}
+                      className="flex-1 border border-muted/30 rounded-[10px] px-3 py-2 bg-bg text-sm"
+                      placeholder="이름"
+                    />
+                    <select
+                      value={row.gender}
+                      onChange={e => updateBulkRow(idx, 'gender', e.target.value)}
+                      className="w-16 border border-muted/30 rounded-[10px] px-1 py-2 bg-bg text-sm text-center"
+                    >
+                      <option value="">-</option>
+                      <option value="M">남</option>
+                      <option value="F">여</option>
+                    </select>
+                    <button
+                      onClick={() => removeBulkRow(idx)}
+                      className={`btn-bounce w-7 h-7 rounded-full text-xs flex items-center justify-center ${
+                        bulkRows.length <= 1 ? 'text-muted/20' : 'text-muted hover:text-red-400 bg-tag-noise/20'
+                      }`}
+                      disabled={bulkRows.length <= 1}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={addBulkRow}
+                className="btn-bounce w-full border-2 border-dashed border-muted/30 rounded-[12px] py-2 text-sm text-muted"
+              >
+                + 행 추가
+              </button>
               <button
                 onClick={addBulkStudents}
                 className="btn-bounce w-full bg-primary text-white font-bold py-3 rounded-[16px]"
