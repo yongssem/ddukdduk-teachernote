@@ -29,10 +29,17 @@ export default function InitialSetupScreen({ onComplete }) {
     onComplete({ school: school.trim(), subjects: trimmedSubjects });
   }
 
+  const bgStyle = {
+    backgroundImage: 'url(/landing-bg.png)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
+
   if (step === 0) {
     return (
-      <div className="min-h-dvh flex items-center justify-center p-6">
-        <div className="bg-card rounded-[24px] shadow-sm p-8 max-w-sm w-full text-center space-y-4">
+      <div className="min-h-dvh flex items-center justify-center p-6 relative" style={bgStyle}>
+        <div className="absolute inset-0 bg-bg/70 backdrop-blur-sm" />
+        <div className="relative bg-card/90 backdrop-blur-md rounded-[24px] shadow-lg p-8 max-w-sm w-full text-center space-y-4">
           <p className="text-4xl">📋</p>
           <h1 className="text-xl font-bold text-text">뚝딱교담수첩</h1>
           <p className="text-sm text-muted">교담(전담) 교사를 위한<br/>학생 누가기록 앱</p>
@@ -53,8 +60,9 @@ export default function InitialSetupScreen({ onComplete }) {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-6">
-      <div className="bg-card rounded-[24px] shadow-sm p-6 max-w-sm w-full space-y-5">
+    <div className="min-h-dvh flex items-center justify-center p-6 relative" style={bgStyle}>
+      <div className="absolute inset-0 bg-bg/70 backdrop-blur-sm" />
+      <div className="relative bg-card/90 backdrop-blur-md rounded-[24px] shadow-lg p-6 max-w-sm w-full space-y-5">
         <div className="text-center">
           <p className="text-2xl mb-1">🏫</p>
           <h2 className="text-lg font-bold">교사 정보 설정</h2>
@@ -68,7 +76,7 @@ export default function InitialSetupScreen({ onComplete }) {
             type="text"
             value={school}
             onChange={e => setSchool(e.target.value)}
-            className="w-full border border-muted/30 rounded-[12px] px-3 py-2.5 bg-bg text-sm"
+            className="w-full border border-muted/30 rounded-[12px] px-3 py-2.5 bg-bg/80 text-sm"
             placeholder="삼향초등학교"
             autoFocus
           />
@@ -84,7 +92,7 @@ export default function InitialSetupScreen({ onComplete }) {
                   type="text"
                   value={subj}
                   onChange={e => updateSubject(idx, e.target.value)}
-                  className="flex-1 border border-muted/30 rounded-[12px] px-3 py-2.5 bg-bg text-sm"
+                  className="flex-1 border border-muted/30 rounded-[12px] px-3 py-2.5 bg-bg/80 text-sm"
                   placeholder={idx === 0 ? '예: 음악' : '예: 미술'}
                 />
                 {subjects.length > 1 && (
