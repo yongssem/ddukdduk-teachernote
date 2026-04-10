@@ -5,8 +5,9 @@ import { TAG_PRESETS, exportBackupJSON, clearData, todayStr } from '../utils/sto
 import { exportClassExcel, exportAllExcel, exportSummaryExcel } from '../utils/excel';
 
 export default function SettingsScreen({ data, onSave, onNavigate }) {
-  const [subject, setSubject] = useState(data.teacher.subject || '');
   const [school, setSchool] = useState(data.teacher.school || '');
+  const [subjects, setSubjects] = useState(data.teacher.subjects || []);
+  const [newSubject, setNewSubject] = useState('');
   const [showCustomAdd, setShowCustomAdd] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customColor, setCustomColor] = useState('#E5E5E5');
@@ -14,15 +15,36 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showResetFinal, setShowResetFinal] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(null);
-  const [showExportPicker, setShowExportPicker] = useState(false);
   const [showExportClass, setShowExportClass] = useState(false);
   const fileRef = useRef(null);
 
-  function saveTeacher() {
+  function saveSchool() {
     onSave({
       ...data,
-      teacher: { subject: subject.trim(), school: school.trim() },
+      teacher: { ...data.teacher, school: school.trim() },
     });
+  }
+
+  function addSubject() {
+    const name = newSubject.trim();
+    if (!name) return;
+    if (subjects.includes(name)) { alert('이미 존재하는 과목입니다.'); return; }
+    const next = [...subjects, name];
+    setSubjects(next);
+    setNewSubject('');
+    onSave({ ...data, teacher: { ...data.teacher, subjects: next } });
+  }
+
+  function removeSubject(idx) {
+    const name = subjects[idx];
+    const hasClasses = data.classes.some(c => c.subject === name);
+    if (hasClasses) {
+      alert(`"${name}" 과목에 연결된 반이 있어 삭제할 수 없습니다. 반을 먼저 삭제해주세요.`);
+      return;
+    }
+    const next = subjects.filter((_, i) => i !== idx);
+    setSubjects(next);
+    onSave({ ...data, teacher: { ...data.teacher, subjects: next } });
   }
 
   function togglePreset(name) {
@@ -96,6 +118,8 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
     if (!showRestoreConfirm) return;
     onSave({ ...showRestoreConfirm, firstRunDone: true });
     setShowRestoreConfirm(null);
+    setSchool(showRestoreConfirm.teacher?.school || '');
+    setSubjects(showRestoreConfirm.teacher?.subjects || []);
     alert('복구가 완료되었습니다.');
   }
 
@@ -112,28 +136,52 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
         {/* Teacher info */}
         <div className="bg-card rounded-[24px] shadow-sm p-4 space-y-3">
           <h3 className="font-bold text-sm">교사 정보</h3>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-xs text-muted block mb-1">학교</label>
-              <input
-                type="text"
-                value={school}
-                onChange={e => setSchool(e.target.value)}
-                onBlur={saveTeacher}
-                className="w-full border border-muted/30 rounded-[12px] px-3 py-2 bg-bg text-sm"
-                placeholder="삼향초"
-              />
+          <div>
+            <label className="text-xs text-muted block mb-1">학교</label>
+            <input
+              type="text"
+              value={school}
+              onChange={e => setSchool(e.target.value)}
+              onBlur={saveSchool}
+              className="w-full border border-muted/30 rounded-[12px] px-3 py-2 bg-bg text-sm"
+              placeholder="삼향초등학교"
+            />
+          </div>
+
+          {/* Subjects */}
+          <div>
+            <label className="text-xs text-muted block mb-1">담당 과목</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {subjects.map((subj, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1 bg-primary/15 rounded-full px-3 py-1.5 text-sm font-medium"
+                >
+                  {subj}
+                  <button
+                    className="btn-bounce text-text/40 hover:text-red-400 ml-0.5"
+                    onClick={() => removeSubject(idx)}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
             </div>
-            <div className="flex-1">
-              <label className="text-xs text-muted block mb-1">과목</label>
+            <div className="flex gap-2">
               <input
                 type="text"
-                value={subject}
-                onChange={e => setSubject(e.target.value)}
-                onBlur={saveTeacher}
-                className="w-full border border-muted/30 rounded-[12px] px-3 py-2 bg-bg text-sm"
-                placeholder="음악"
+                value={newSubject}
+                onChange={e => setNewSubject(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addSubject()}
+                className="flex-1 border border-muted/30 rounded-[12px] px-3 py-2 bg-bg text-sm"
+                placeholder="과목 이름"
               />
+              <button
+                onClick={addSubject}
+                className="btn-bounce bg-primary text-white px-4 rounded-[12px] text-sm font-medium"
+              >
+                추가
+              </button>
             </div>
           </div>
         </div>
@@ -385,7 +433,7 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
                 setShowExportClass(false);
               }}
             >
-              {cls.grade}-{cls.classNum} ({cls.students.length}명)
+              {cls.subject ? `[${cls.subject}] ` : ''}{cls.grade}-{cls.classNum} ({cls.students.length}명)
             </button>
           ))}
         </div>

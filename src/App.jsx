@@ -4,7 +4,7 @@ import HomeScreen from './components/HomeScreen';
 import ClassScreen from './components/ClassScreen';
 import StudentScreen from './components/StudentScreen';
 import SettingsScreen from './components/SettingsScreen';
-import FirstRunModal from './components/FirstRunModal';
+import InitialSetupScreen from './components/InitialSetupScreen';
 import IncognitoWarning from './components/IncognitoWarning';
 import BackupBanner from './components/BackupBanner';
 
@@ -13,11 +13,9 @@ export default function App() {
   const [screen, setScreen] = useState('home');
   const [classId, setClassId] = useState(null);
   const [studentNo, setStudentNo] = useState(null);
-  const [showFirstRun, setShowFirstRun] = useState(false);
   const [incognito, setIncognito] = useState(false);
 
   useEffect(() => {
-    if (!data.firstRunDone) setShowFirstRun(true);
     isIncognito().then(setIncognito);
   }, []);
 
@@ -26,15 +24,23 @@ export default function App() {
     saveData(newData);
   }
 
-  function handleFirstRunClose() {
-    setShowFirstRun(false);
-    handleSave({ ...data, firstRunDone: true });
+  function handleSetupComplete({ school, subjects }) {
+    handleSave({
+      ...data,
+      teacher: { school, subjects },
+      firstRunDone: true,
+    });
   }
 
   function navigate(screen, cId, sNo) {
     setScreen(screen);
     if (cId !== undefined) setClassId(cId);
     if (sNo !== undefined) setStudentNo(sNo);
+  }
+
+  // Show initial setup if not done
+  if (!data.firstRunDone) {
+    return <InitialSetupScreen onComplete={handleSetupComplete} />;
   }
 
   const currentClass = data.classes.find(c => c.id === classId);
@@ -46,7 +52,7 @@ export default function App() {
       <div className="flex-1">
         {/* Warnings */}
         {screen === 'home' && incognito && <div className="pt-3"><IncognitoWarning /></div>}
-        {screen === 'home' && data.firstRunDone && <BackupBanner days={backupDays} onGoSettings={() => navigate('settings')} />}
+        {screen === 'home' && <BackupBanner days={backupDays} onGoSettings={() => navigate('settings')} />}
 
         {/* Screens */}
         {screen === 'home' && (
@@ -69,9 +75,6 @@ export default function App() {
           &copy; 2026 무궁무진클래스 &middot; 용쌤
         </a>
       </footer>
-
-      {/* First run modal */}
-      <FirstRunModal open={showFirstRun} onClose={handleFirstRunClose} />
     </div>
   );
 }

@@ -29,9 +29,11 @@ export function exportClassExcel(cls, tagSettings) {
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{ wch: 6 }, { wch: 10 }, { wch: 6 }, { wch: 12 }, { wch: 8 }, { wch: 40 }];
-  XLSX.utils.book_append_sheet(wb, ws, `${cls.grade}-${cls.classNum}`);
+  const sheetName = cls.subject ? `${cls.subject} ${cls.grade}-${cls.classNum}` : `${cls.grade}-${cls.classNum}`;
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-  XLSX.writeFile(wb, `뚝딱교담수첩_${cls.grade}-${cls.classNum}_${todayStr()}.xlsx`);
+  const fileName = cls.subject ? `뚝딱교담수첩_${cls.subject}_${cls.grade}-${cls.classNum}_${todayStr()}.xlsx` : `뚝딱교담수첩_${cls.grade}-${cls.classNum}_${todayStr()}.xlsx`;
+  XLSX.writeFile(wb, fileName);
 }
 
 export function exportAllExcel(classes, tagSettings) {
@@ -50,7 +52,8 @@ export function exportAllExcel(classes, tagSettings) {
     }
     const ws = XLSX.utils.aoa_to_sheet(rows);
     ws['!cols'] = [{ wch: 6 }, { wch: 10 }, { wch: 6 }, { wch: 12 }, { wch: 8 }, { wch: 40 }];
-    XLSX.utils.book_append_sheet(wb, ws, `${cls.grade}-${cls.classNum}`);
+    const sheetName = cls.subject ? `${cls.subject} ${cls.grade}-${cls.classNum}` : `${cls.grade}-${cls.classNum}`;
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
   }
 
   XLSX.writeFile(wb, `뚝딱교담수첩_전체_${todayStr()}.xlsx`);
@@ -60,10 +63,11 @@ export function exportSummaryExcel(classes, tagSettings) {
   const wb = XLSX.utils.book_new();
 
   // Summary sheet
-  const summaryRows = [['반', '번호', '이름', '성별', '기록 요약']];
+  const summaryRows = [['과목', '반', '번호', '이름', '성별', '기록 요약']];
   for (const cls of classes) {
     for (const student of cls.students) {
       summaryRows.push([
+        cls.subject || '',
         `${cls.grade}-${cls.classNum}`,
         student.no,
         student.name,
@@ -73,7 +77,7 @@ export function exportSummaryExcel(classes, tagSettings) {
     }
   }
   const summaryWs = XLSX.utils.aoa_to_sheet(summaryRows);
-  summaryWs['!cols'] = [{ wch: 8 }, { wch: 6 }, { wch: 10 }, { wch: 6 }, { wch: 80 }];
+  summaryWs['!cols'] = [{ wch: 8 }, { wch: 8 }, { wch: 6 }, { wch: 10 }, { wch: 6 }, { wch: 80 }];
   XLSX.utils.book_append_sheet(wb, summaryWs, '학생별 요약');
 
   // Statistics sheet
@@ -86,7 +90,7 @@ export function exportSummaryExcel(classes, tagSettings) {
     allTagNames.push(t.name);
   }
 
-  const statsRows = [['반', '번호', '이름', ...allTagNames, '태그없음', '합계']];
+  const statsRows = [['과목', '반', '번호', '이름', ...allTagNames, '태그없음', '합계']];
   for (const cls of classes) {
     for (const student of cls.students) {
       const counts = {};
@@ -102,6 +106,7 @@ export function exportSummaryExcel(classes, tagSettings) {
         }
       }
       statsRows.push([
+        cls.subject || '',
         `${cls.grade}-${cls.classNum}`,
         student.no,
         student.name,
@@ -112,7 +117,7 @@ export function exportSummaryExcel(classes, tagSettings) {
     }
   }
   const statsWs = XLSX.utils.aoa_to_sheet(statsRows);
-  statsWs['!cols'] = [{ wch: 8 }, { wch: 6 }, { wch: 10 }, ...allTagNames.map(() => ({ wch: 8 })), { wch: 8 }, { wch: 6 }];
+  statsWs['!cols'] = [{ wch: 8 }, { wch: 8 }, { wch: 6 }, { wch: 10 }, ...allTagNames.map(() => ({ wch: 8 })), { wch: 8 }, { wch: 6 }];
   XLSX.utils.book_append_sheet(wb, statsWs, '통계');
 
   XLSX.writeFile(wb, `뚝딱교담수첩_요약_${todayStr()}.xlsx`);

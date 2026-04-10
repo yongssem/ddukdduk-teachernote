@@ -101,7 +101,7 @@ export default function ClassScreen({ cls, data, onSave, onNavigate }) {
   return (
     <div className="pb-6">
       <Header
-        title={`${cls.grade}-${cls.classNum}`}
+        title={`${cls.subject ? cls.subject + ' ' : ''}${cls.grade}-${cls.classNum}`}
         onBack={() => onNavigate('home')}
         right={
           <span className="text-xs text-muted">{students.length}명</span>

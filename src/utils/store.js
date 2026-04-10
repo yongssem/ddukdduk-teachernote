@@ -9,7 +9,7 @@ const TAG_PRESETS = {
 };
 
 const DEFAULT_DATA = {
-  teacher: { subject: '', school: '' },
+  teacher: { subjects: [], school: '' },
   tagSettings: {
     presets: { '우수': true, '참여': true, '성장': true, '소란': true, '특이': true },
     custom: [],
