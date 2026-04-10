@@ -22,11 +22,18 @@
 }
 
 body {
-  background-color: var(--color-bg);
+  background: var(--color-bg) url('/landing-bg.png') center / cover fixed;
   color: var(--color-text);
   min-height: 100dvh;
   margin: 0;
   -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  background-color: rgba(255, 248, 240, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  min-height: 100dvh;
 }
 
 .btn-bounce:active {
