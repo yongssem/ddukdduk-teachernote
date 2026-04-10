@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { todayStr } from '../utils/store';
+import { todayStr, getSubjectColor } from '../utils/store';
 import Modal from './Modal';
 
 export default function HomeScreen({ data, onSave, onNavigate }) {
@@ -59,6 +59,7 @@ export default function HomeScreen({ data, onSave, onNavigate }) {
     const recordCount = cls.students.reduce((s, st) => s + (st.records || []).length, 0);
     const todayCount = cls.students.reduce((s, st) =>
       s + (st.records || []).filter(r => r.date === today).length, 0);
+    const color = getSubjectColor(cls.subject, subjects);
 
     return (
       <button
@@ -72,12 +73,12 @@ export default function HomeScreen({ data, onSave, onNavigate }) {
         >
           ✕
         </button>
-        <p className="text-2xl font-bold text-primary">{cls.grade}-{cls.classNum}</p>
+        <p className="text-2xl font-bold" style={{ color }}>{cls.grade}-{cls.classNum}</p>
         <p className="text-xs text-muted mt-1">{studentCount}명</p>
         <div className="flex items-center gap-2 mt-2 text-xs">
-          <span className="bg-accent/30 rounded-full px-2 py-0.5">기록 {recordCount}</span>
+          <span className="rounded-full px-2 py-0.5" style={{ backgroundColor: color + '30' }}>기록 {recordCount}</span>
           {todayCount > 0 && (
-            <span className="bg-primary/20 rounded-full px-2 py-0.5">오늘 {todayCount}</span>
+            <span className="rounded-full px-2 py-0.5" style={{ backgroundColor: color + '25' }}>오늘 {todayCount}</span>
           )}
         </div>
       </button>
@@ -114,17 +115,20 @@ export default function HomeScreen({ data, onSave, onNavigate }) {
       </div>
 
       {/* Classes grouped by subject */}
-      {subjects.map(subj => (
+      {subjects.map(subj => {
+        const subjColor = getSubjectColor(subj, subjects);
+        return (
         <div key={subj} className="mb-4">
           <h2 className="text-sm font-bold text-muted mb-2 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-primary inline-block" />
-            {subj}
+            <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: subjColor }} />
+            <span style={{ color: subjColor }}>{subj}</span>
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {classesBySubject[subj].map(renderClassCard)}
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {/* Orphan classes (backward compat) */}
       {orphanClasses.length > 0 && (
@@ -153,19 +157,23 @@ export default function HomeScreen({ data, onSave, onNavigate }) {
             <div>
               <label className="text-xs text-muted block mb-1">과목</label>
               <div className="flex gap-2 flex-wrap">
-                {subjects.map(subj => (
-                  <button
-                    key={subj}
-                    className={`btn-bounce rounded-full px-4 py-2 text-sm font-medium border-2 transition-all ${
-                      selectedSubject === subj
-                        ? 'bg-primary/20 border-primary text-text'
-                        : 'bg-bg border-muted/20 text-muted'
-                    }`}
-                    onClick={() => setSelectedSubject(subj)}
-                  >
-                    {subj}
-                  </button>
-                ))}
+                {subjects.map(subj => {
+                  const sc = getSubjectColor(subj, subjects);
+                  return (
+                    <button
+                      key={subj}
+                      className={`btn-bounce rounded-full px-4 py-2 text-sm font-medium border-2 transition-all ${
+                        selectedSubject === subj
+                          ? 'text-text'
+                          : 'bg-bg border-muted/20 text-muted'
+                      }`}
+                      style={selectedSubject === subj ? { backgroundColor: sc + '30', borderColor: sc } : {}}
+                      onClick={() => setSelectedSubject(subj)}
+                    >
+                      {subj}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import Header from './Header';
 import Modal from './Modal';
-import { TAG_PRESETS, exportBackupJSON, clearData, todayStr } from '../utils/store';
+import { TAG_PRESETS, exportBackupJSON, clearData, todayStr, getSubjectColor } from '../utils/store';
 import { exportClassExcel, exportAllExcel, exportSummaryExcel } from '../utils/excel';
 
 export default function SettingsScreen({ data, onSave, onNavigate }) {
@@ -152,20 +152,24 @@ export default function SettingsScreen({ data, onSave, onNavigate }) {
           <div>
             <label className="text-xs text-muted block mb-1">담당 과목</label>
             <div className="flex flex-wrap gap-2 mb-2">
-              {subjects.map((subj, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1 bg-primary/15 rounded-full px-3 py-1.5 text-sm font-medium"
-                >
-                  {subj}
-                  <button
-                    className="btn-bounce text-text/40 hover:text-red-400 ml-0.5"
-                    onClick={() => removeSubject(idx)}
+              {subjects.map((subj, idx) => {
+                const sc = getSubjectColor(subj, subjects);
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium"
+                    style={{ backgroundColor: sc + '30', color: sc }}
                   >
-                    ✕
-                  </button>
-                </span>
-              ))}
+                    <span className="text-text">{subj}</span>
+                    <button
+                      className="btn-bounce text-text/40 hover:text-red-400 ml-0.5"
+                      onClick={() => removeSubject(idx)}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                );
+              })}
             </div>
             <div className="flex gap-2">
               <input

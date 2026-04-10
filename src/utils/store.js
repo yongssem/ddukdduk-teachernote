@@ -1,5 +1,22 @@
 const STORAGE_KEY = 'ddukddak-gyodam-v1';
 
+const SUBJECT_COLORS = [
+  '#FF9A8B', // 코랄
+  '#7EB5F5', // 블루
+  '#A8E6CF', // 민트
+  '#D4B5FF', // 퍼플
+  '#FFD36E', // 옐로
+  '#FF8DC7', // 핑크
+  '#82D9C5', // 틸
+  '#FFA96B', // 오렌지
+];
+
+export function getSubjectColor(subjectName, subjects) {
+  const idx = (subjects || []).indexOf(subjectName);
+  if (idx < 0) return '#9CA3AF';
+  return SUBJECT_COLORS[idx % SUBJECT_COLORS.length];
+}
+
 const TAG_PRESETS = {
   '우수': { color: '#A8E6CF', emoji: '⭐' },
   '참여': { color: '#B5DEFF', emoji: '🙋' },
